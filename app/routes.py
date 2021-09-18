@@ -7,8 +7,11 @@ from flask import request
 
 from app import app
 
+from app.tools.tools import todict
+from app.tools import logger
+
 from app.tools.sqllite_manager import SqliteManager
-from datetime import datetime
+from app.models.intervention import Intervention
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -37,3 +40,45 @@ def add_intervention():
 
         message = "Certaines informations sont manquante"
         return make_response(jsonify(message), 404)
+
+
+@app.route("/intervention/<int:intervention>", methods=["PUT"])
+def edit_intervention(intervention):
+    """
+    Load home page
+    """
+    sqlite_manager = SqliteManager()
+    if request.method == 'PUT':
+
+        print(intervention)
+        result = request.json
+        # Check if intervention exist
+        get_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention)
+
+        if get_intervention.first():
+
+            # Check diff
+            dict_update = {}
+
+            try:
+                for key, value in todict(get_intervention.first()).items():
+                    print(key)
+                    if key != 'intervention_id':
+                        if value != result[key]:
+                            dict_update[key] = result[key]
+
+                if dict_update.get('date_intervention'):
+                    dict_update['date_intervention'] = datetime.strptime(dict_update['date_intervention'], '%d/%m/%Y %H:%M:%S')
+                get_intervention.update(dict_update)
+                sqlite_manager.session.commit()
+                sqlite_manager.session.close()
+
+                message = f"L'intervention à bien était modifié"
+                logger.info(message)
+                return make_response(message, 200)
+
+            except KeyError as e:
+                message = f"Une erreur est survenue lors de la modification de l'intervention: {e}"
+                logger.error(message)
+                return make_response(message, 404)
+

@@ -5,8 +5,8 @@ import unittest
 from pathlib import Path
 from datetime import datetime
 from app import app as flask_app
-from app.tools.sqllite_manager import SqliteManager
 
+from app.tools.sqllite_manager import SqliteManager
 from app.models.intervention import Intervention
 
 
@@ -89,3 +89,42 @@ class TestSqlDataframe(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_edit_intervention_success(self):
+        """
+        Test edit intervention
+        """
+
+        # Create intervention for edit with request put
+
+        add_intervention = Intervention(
+            label='TEST LABEL',
+            description='Description',
+            author='Eddy',
+            location='Le Mans',
+            date_intervention=datetime(2021, 10, 10, 10, 0, 0),
+        )
+
+        self.sqllite_manager.session.add(add_intervention)
+        self.sqllite_manager.session.commit()
+
+        # get id intervention
+
+        intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
+        self.sqllite_manager.session.close()
+        response = self.client.put(
+            f'/intervention/{intervention_object.intervention_id}',
+            json={
+                'label': 'TEST LABEL',
+                'description': 'Description',
+                'author': 'Eddy',
+                'location': 'Nantes',
+                'date_intervention': '22/09/2021 13:00:00',
+            },
+
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
+        self.assertEqual(intervention_object.location, 'Nantes')
