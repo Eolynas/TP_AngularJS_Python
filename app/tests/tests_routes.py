@@ -31,21 +31,58 @@ class TestSqlDataframe(unittest.TestCase):
         """
         Intervention recovery test
         """
+        # Create intervention for edit with request put
+
+        add_intervention_1 = Intervention(
+            label='TEST LABEL',
+            description='Description',
+            author='Eddy',
+            location='Le Mans',
+            date_intervention=datetime(2021, 10, 10, 10, 0, 0),
+        )
+
+        self.sqllite_manager.session.add(add_intervention_1)
+        self.sqllite_manager.session.commit()
+
+        # Create intervention for edit with request put
+
+        add_intervention_2 = Intervention(
+            label='TEST LABEL 2',
+            description='Description',
+            author='Bob',
+            location='Nantes',
+            date_intervention=datetime(2020, 5, 5, 10, 0, 0),
+        )
+
+        self.sqllite_manager.session.add(add_intervention_2)
+        self.sqllite_manager.session.commit()
         response = self.client.get('/index')
 
         result_list = [
             {
                 'label': 'TEST LABEL',
-                'description': "Création d'une nouvelle intervention",
+                'description': "Description",
                 'author': 'Eddy',
                 'location': 'Le Mans',
-                'date_intervention': '22/09/2021',
+                # 'date_intervention': '22/09/2021',
+            },
+            {
+                'label': 'TEST LABEL 2',
+                'description': "Description",
+                'author': 'Bob',
+                'location': 'Nantes',
+                # 'date_intervention': '22/09/2021',
             }
         ]
 
         # Testing status code & interventions informations
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.decode("utf-8"), result_list)
+
+        for intervention in response.json:
+            self.assertIn(intervention['label'], ['TEST LABEL', 'TEST LABEL 2'])
+            self.assertIn(intervention['author'], ['Eddy', 'Bob'])
+            self.assertIn(intervention['location'], ['Le Mans', 'Nantes'])
+            self.assertEqual(intervention['description'], "Description")
 
     def test_add_intervention(self):
         """
@@ -128,3 +165,65 @@ class TestSqlDataframe(unittest.TestCase):
 
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
         self.assertEqual(intervention_object.location, 'Nantes')
+
+    def test_delete_intervention_success(self):
+        """
+        Test delete intervention
+        """
+
+        # Create intervention for edit with request put
+
+        add_intervention = Intervention(
+            label='TEST LABEL',
+            description='Description',
+            author='Eddy',
+            location='Le Mans',
+            date_intervention=datetime(2021, 10, 10, 10, 0, 0),
+        )
+
+        self.sqllite_manager.session.add(add_intervention)
+        self.sqllite_manager.session.commit()
+
+        # get id intervention
+
+        intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
+        self.sqllite_manager.session.close()
+        response = self.client.delete(
+            f'/intervention/{intervention_object.intervention_id}',
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').all()
+        self.assertEqual(len(intervention_object), 0)
+
+    def test_delete_intervention_with_error(self):
+        """
+        Test delete intervention with error intervention_id
+        """
+
+        # Create intervention for edit with request put
+
+        add_intervention = Intervention(
+            label='TEST LABEL',
+            description='Description',
+            author='Eddy',
+            location='Le Mans',
+            date_intervention=datetime(2021, 10, 10, 10, 0, 0),
+        )
+
+        self.sqllite_manager.session.add(add_intervention)
+        self.sqllite_manager.session.commit()
+
+        # get id intervention
+
+        intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
+        self.sqllite_manager.session.close()
+        response = self.client.delete(
+            f'/intervention/{intervention_object.intervention_id +1}',
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').all()
+        self.assertEqual(len(intervention_object), 1)

@@ -14,13 +14,18 @@ from app.tools.sqllite_manager import SqliteManager
 from app.models.intervention import Intervention
 
 
-@app.route("/", methods=["GET", "POST"])
-@app.route("/index", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
+@app.route("/index", methods=["GET"])
 def index():
     """
-    Load home page
+    Load home page with list intervention
     """
-    return 'Hello World!'
+    sqlite_manager = SqliteManager()
+    if request.method == 'GET':
+        get_interventions = sqlite_manager.session.query(Intervention).all()
+        dict_interventions = todict(get_interventions)
+
+        return make_response(jsonify(dict_interventions), 200)
 
 
 @app.route("/intervention/add", methods=["POST"])
@@ -42,7 +47,7 @@ def add_intervention():
         return make_response(jsonify(message), 404)
 
 
-@app.route("/intervention/<int:intervention>", methods=["PUT"])
+@app.route("/intervention/<int:intervention>", methods=["PUT", "DELETE"])
 def edit_intervention(intervention):
     """
     Load home page
@@ -81,4 +86,24 @@ def edit_intervention(intervention):
                 message = f"Une erreur est survenue lors de la modification de l'intervention: {e}"
                 logger.error(message)
                 return make_response(message, 404)
+
+        message = f"Une erreur est survenue lors de la modification de l'intervention"
+        logger.error(message)
+        return make_response(message, 404)
+
+    if request.method == 'DELETE':
+        get_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention)
+
+        if get_intervention.first():
+            sqlite_manager.session.delete(get_intervention.first())
+            sqlite_manager.session.commit()
+            sqlite_manager.session.close()
+
+            message = f"L'intervention à bien était supprimé"
+            logger.info(message)
+            return make_response(message, 200)
+
+        message = f"Une erreur est survenue lors de la suppression de l'intervention"
+        logger.error(message)
+        return make_response(message, 404)
 
