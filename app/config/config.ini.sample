@@ -1,0 +1,2 @@
+[sqliteserver]
+db_url = path -> db_url for sqlite database
