@@ -10,12 +10,12 @@ from app.tools.sqllite_manager import SqliteManager
 from app.models.intervention import Intervention
 
 
-class TestSqlDataframe(unittest.TestCase):
+class TestRoutes(unittest.TestCase):
     def setUp(self) -> None:
         os.environ["ENV"] = "test"
         os.environ[
             "URL_DB_TEST"
-        ] = f"sqlite:///{os.path.join(Path(__file__).parents[2], 'osmose_postgres_test.db')}"
+        ] = f"sqlite:///{os.path.join(Path(__file__).parents[2], 'ticket_test.db')}"
         self.file_csv = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             os.path.join("files_test", "sigmat_postgres_test.csv"),
@@ -56,7 +56,7 @@ class TestSqlDataframe(unittest.TestCase):
 
         self.sqllite_manager.session.add(add_intervention_2)
         self.sqllite_manager.session.commit()
-        response = self.client.get('/index')
+        response = self.client.get('/interventions')
 
         result_list = [
             {

@@ -4,3 +4,7 @@ app/config/config.ini
 app/__pycache__/
 
 app/tools/__pycache__/
+
+app/models/__pycache__/
+
+osmose_postgres_test.db

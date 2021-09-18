@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+{#<html ng-app="interventionApp">#}
+<head>
+    <title>Hello AngularJS</title>
+    <!-- Check version: https://code.angularjs.org/ -->
+    {#    <script src="static/angular.min.js"></script>#}
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+
+    <script src="static/app.js"></script>
+</head>
+
+<body ng-app="ticketApp">
+<section ng-controller="myCtrl">
+    <h1>Listes des interventions</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Label</th>
+            <th scope="col">description</th>
+            <th scope="col">Auteur</th>
+            <th scope="col">Lieu</th>
+            <th scope="col">date_intervention</th>
+            <th scope="col">Modifier</th>
+            <th scope="col">Supprimer</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="inter in list_interventions">
+        <th>[[inter.intervention_id]]</th>
+        <th>[[inter.label]]</th>
+        <th>[[inter.description]]</th>
+        <th>[[inter.author]]</th>
+        <th>[[inter.location]]</th>
+        <th>[[inter.date_intervention]]</th>
+        <th>
+            <button data-toggle="modal" data-target="[['#modal' + inter.intervention_id]]">Modifier</button>
+        </th>
+        <th>
+            <button ng-click="deleteIntervention(inter.intervention_id)">Supprimer [[inter.intervention_id]]</button>
+        </th>
+        </tbody>
+    </table>
+    {#  MODAL ADD INTERVENTION  #}
+    <div ng-repeat="inter in list_interventions" class="modal" id="[['modal' + inter.intervention_id]]" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier l'intervention [[inter.label]]</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editIntervention">
+                    <div class="modal-body">
+
+                        <label for="LabelIntervention">Libellé</label>
+                        <input type="text" class="form-control" id="LabelIntervention" value="sqdqsdqsdqd" ng-model="label">
+
+                        <label for="LabelDescription">Description</label>
+                        <textarea ng-model="description" class="form-control"
+                                  id="LabelDescription"></textarea>
+
+                        <label for="LabelAuthor">Votre nom</label>
+                        <input type="text" ng-model="author" class="form-control" id="LabelAuthor">
+                        {##}
+                        <label for="LabelLocation">Lieux de l'intervention</label>
+                        <input type="text" ng-model="location" class="form-control" id="LabelLocation">
+                        {##}
+                        <label for="LabelDate">Date de l'intervention</label>
+                        <input type="text" ng-model="date_intervention" class="form-control" id="LabelDate"
+                               placeholder="exemple: 18/09/2021 12:00:00">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit"
+                                ng-click="postdata(label, description, author, location, date_intervention)"
+                                class="btn btn-primary" data-dismiss="modal">Valider ma demande
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulé</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalFormIntervention">
+        Ajouter un ticket
+    </button>
+
+    {#  MODAL ADD INTERVENTION  #}
+    <div class="modal" id="modalFormIntervention" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nouvelle intervention</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addIntervention" method="post">
+                    <div class="modal-body">
+
+                        <label for="LabelIntervention">Libellé</label>
+                        <input type="text" class="form-control" id="LabelIntervention" ng-model="label">
+
+                        <label for="LabelDescription">Description</label>
+                        <textarea ng-model="description" class="form-control"
+                                  id="LabelDescription"></textarea>
+
+                        <label for="LabelAuthor">Votre nom</label>
+                        <input type="text" ng-model="author" class="form-control" id="LabelAuthor">
+                        {##}
+                        <label for="LabelLocation">Lieux de l'intervention</label>
+                        <input type="text" ng-model="location" class="form-control" id="LabelLocation">
+                        {##}
+                        <label for="LabelDate">Date de l'intervention</label>
+                        <input type="text" ng-model="date_intervention" class="form-control" id="LabelDate"
+                               placeholder="exemple: 18/09/2021 12:00:00">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit"
+                                ng-click="postdata(label, description, author, location, date_intervention)"
+                                class="btn btn-primary" data-dismiss="modal">Valider ma demande
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulé</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

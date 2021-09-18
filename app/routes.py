@@ -20,6 +20,23 @@ def index():
     """
     Load home page with list intervention
     """
+
+    # return render_template('index.html')
+    return render_template('index.html')
+
+    # sqlite_manager = SqliteManager()
+    # if request.method == 'GET':
+    #     get_interventions = sqlite_manager.session.query(Intervention).all()
+    #     dict_interventions = todict(get_interventions)
+    #
+    #     return make_response(jsonify(dict_interventions), 200)
+
+
+@app.route("/interventions", methods=["GET"])
+def list_interventions():
+    """
+    Load home page with list intervention
+    """
     sqlite_manager = SqliteManager()
     if request.method == 'GET':
         get_interventions = sqlite_manager.session.query(Intervention).all()
@@ -35,13 +52,14 @@ def add_intervention():
     """
     sqlite_manager = SqliteManager()
     if request.method == 'POST':
-        result = request.json
-        # Check data resquest post
-        if 'label' in result and 'description' in result and 'author' in result and 'location' in result and 'date_intervention' in result:
-            result['date_intervention'] = datetime.strptime(result['date_intervention'], '%d/%m/%Y %H:%M:%S')
-            res_insert = sqlite_manager.add_intervention(intervention=result)
-            message = "L'intervetion à bien été enregistré"
-            return make_response(jsonify(message), 201)
+        return make_response('ok', 201)
+        # result = request.json
+        # # Check data resquest post
+        # if 'label' in result and 'description' in result and 'author' in result and 'location' in result and 'date_intervention' in result:
+        #     result['date_intervention'] = datetime.strptime(result['date_intervention'], '%d/%m/%Y %H:%M:%S')
+        #     res_insert = sqlite_manager.add_intervention(intervention=result)
+        #     message = "L'intervetion à bien été enregistré"
+        #     return make_response(jsonify(message), 201)
 
         message = "Certaines informations sont manquante"
         return make_response(jsonify(message), 404)
