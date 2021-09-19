@@ -39,21 +39,21 @@
         </tr>
         </thead>
         <tbody ng-repeat="inter in list_interventions">
-        <th>[[inter.intervention_id]]</th>
-        <th>[[inter.label]]</th>
-        <th>[[inter.description]]</th>
-        <th>[[inter.author]]</th>
-        <th>[[inter.location]]</th>
-        <th>[[inter.date_intervention]]</th>
-        <th>
-            <button data-toggle="modal" data-target="[['#modal' + inter.intervention_id]]">Modifier</button>
-        </th>
-        <th>
-            <button ng-click="deleteIntervention(inter.intervention_id)">Supprimer [[inter.intervention_id]]</button>
-        </th>
+            <th>[[inter.intervention_id]]</th>
+            <th>[[inter.label]]</th>
+            <th>[[inter.description]]</th>
+            <th>[[inter.author]]</th>
+            <th>[[inter.location]]</th>
+            <th>[[inter.date_intervention]]</th>
+            <th>
+                <button data-toggle="modal" data-target="[['#modal' + inter.intervention_id]]">Modifier</button>
+            </th>
+            <th>
+                <button ng-click="deleteIntervention(inter.intervention_id)">Supprimer [[inter.intervention_id]]</button>
+            </th>
         </tbody>
     </table>
-    {#  MODAL ADD INTERVENTION  #}
+    {#  MODAL EDIT INTERVENTION  #}
     <div ng-repeat="inter in list_interventions" class="modal" id="[['modal' + inter.intervention_id]]" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -67,26 +67,26 @@
                     <div class="modal-body">
 
                         <label for="LabelIntervention">Libellé</label>
-                        <input type="text" class="form-control" id="LabelIntervention" value="sqdqsdqsdqd" ng-model="label">
+                        <input type="text" class="form-control" id="LabelIntervention" ng-model="inter.label">
 
                         <label for="LabelDescription">Description</label>
-                        <textarea ng-model="description" class="form-control"
+                        <textarea ng-model="inter.description" class="form-control"
                                   id="LabelDescription"></textarea>
 
                         <label for="LabelAuthor">Votre nom</label>
-                        <input type="text" ng-model="author" class="form-control" id="LabelAuthor">
-                        {##}
+                        <input type="text" ng-model="inter.author" class="form-control" id="LabelAuthor">
+
                         <label for="LabelLocation">Lieux de l'intervention</label>
-                        <input type="text" ng-model="location" class="form-control" id="LabelLocation">
-                        {##}
+                        <input type="text" ng-model="inter.location" class="form-control" id="LabelLocation">
+
                         <label for="LabelDate">Date de l'intervention</label>
-                        <input type="text" ng-model="date_intervention" class="form-control" id="LabelDate"
+                        <input type="text" ng-model="inter.date_intervention" class="form-control" id="LabelDate"
                                placeholder="exemple: 18/09/2021 12:00:00">
 
                     </div>
                     <div class="modal-footer">
                         <button type="submit"
-                                ng-click="postdata(label, description, author, location, date_intervention)"
+                                ng-click="editIntervention($index, inter.intervention_id, inter.label, inter.description, inter.author, inter.location, inter.date_intervention)"
                                 class="btn btn-primary" data-dismiss="modal">Valider ma demande
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulé</button>

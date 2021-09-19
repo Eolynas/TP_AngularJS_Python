@@ -48,10 +48,11 @@ angular.module('ticketApp', [])
                 date_intervention: date_intervention
             };
             $http.put("/intervention/" + intervention_id, JSON.stringify(intervention))
-                .then(function (response) {
+                .then(function (response, index) {
                     // $scope.books = response.data;
-                    $scope.list_interventions.splice($scope.list_interventions.indexOf(intervention_id), 1);
+
                 });
+            $scope.list_interventions[index]['date_intervention'] = intervention['date_intervention']
 
         }
 

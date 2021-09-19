@@ -42,6 +42,10 @@ def list_interventions():
         get_interventions = sqlite_manager.session.query(Intervention).all()
         dict_interventions = todict(get_interventions)
 
+        # Format date
+        for date in dict_interventions:
+            date['date_intervention']= date['date_intervention'].strftime("%d/%m/%Y, %H:%M:%S")
+
         return make_response(jsonify(dict_interventions), 200)
 
 
@@ -91,7 +95,7 @@ def edit_intervention(intervention):
                             dict_update[key] = result[key]
 
                 if dict_update.get('date_intervention'):
-                    dict_update['date_intervention'] = datetime.strptime(dict_update['date_intervention'], '%d/%m/%Y %H:%M:%S')
+                    dict_update['date_intervention'] = datetime.strptime(dict_update['date_intervention'], '%d/%m/%Y, %H:%M:%S')
                 get_intervention.update(dict_update)
                 sqlite_manager.session.commit()
                 sqlite_manager.session.close()
