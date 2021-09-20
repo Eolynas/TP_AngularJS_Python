@@ -38,6 +38,7 @@ class SqliteManager:
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
         self.Base = Base
+        self.create_tables()
 
     def create_tables(self):
         """

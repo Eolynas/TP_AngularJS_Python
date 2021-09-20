@@ -156,7 +156,7 @@ class TestRoutes(unittest.TestCase):
                 'description': 'Description',
                 'author': 'Eddy',
                 'location': 'Nantes',
-                'date_intervention': '22/09/2021 13:00:00',
+                'date_intervention': '22/09/2021, 13:00:00',
             },
 
         )

@@ -9,6 +9,11 @@ angular.module('ticketApp', [])
         $scope.list_interventions = []
         $http.get('/interventions')
             .then(function (response) {
+                for (index in response.data) {
+                    intervention = status_intervention(response.data[index])
+                    response.data[index] = intervention
+                }
+
                 $scope.list_interventions = response.data
             });
         $scope.postdata = function (label, description, author, location, date_intervention) {
@@ -23,7 +28,8 @@ angular.module('ticketApp', [])
             $http.post("/intervention/add", JSON.stringify(intervention))
                 .then(function (response) {
                     // $scope.books = response.data;
-                    $scope.list_interventions.push(intervention);
+                    new_inter = status_intervention(intervention)
+                    $scope.list_interventions.push(new_inter);
                 });
 
         }
@@ -62,6 +68,22 @@ angular.module('ticketApp', [])
         $interpolateProvider.startSymbol('[[').endSymbol(']]');
     });
 
+function status_intervention(data) {
+    var status_intervention = 'Validée'
+    for (const [key, value] of Object.entries(data)) {
+        console.log(`${key}: ${value}`);
+        if (value === '' || value == null) {
+            status_intervention = 'Brouillon'
+        }
+        if (key === 'date_intervention') {
+            if (moment(value) < moment()) {
+                status_intervention = 'Terminé'
+            }
+        }
+    }
+    data.status = status_intervention
+    return data
+}
 
 $('#modalFormIntervention').on('shown.bs.modal', function () {
     $('#myInput').trigger('focus')

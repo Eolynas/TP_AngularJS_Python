@@ -6,6 +6,7 @@
     <!-- Check version: https://code.angularjs.org/ -->
     {#    <script src="static/angular.min.js"></script>#}
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -18,7 +19,9 @@
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
 
+
     <script src="static/app.js"></script>
+    <script src="static/moment-with-locales.min.js"></script>
 </head>
 
 <body ng-app="ticketApp">
@@ -34,6 +37,7 @@
             <th scope="col">Auteur</th>
             <th scope="col">Lieu</th>
             <th scope="col">date_intervention</th>
+            <th scope="col">Status de l'intervention</th>
             <th scope="col">Modifier</th>
             <th scope="col">Supprimer</th>
         </tr>
@@ -44,7 +48,8 @@
             <th>[[inter.description]]</th>
             <th>[[inter.author]]</th>
             <th>[[inter.location]]</th>
-            <th>[[inter.date_intervention]]</th>
+            <th>[[inter.date_intervention | date:'yyyy']]</th>
+            <th>[[inter.status]]</th>
             <th>
                 <button data-toggle="modal" data-target="[['#modal' + inter.intervention_id]]">Modifier</button>
             </th>
@@ -67,7 +72,14 @@
                     <div class="modal-body">
 
                         <label for="LabelIntervention">Libellé</label>
-                        <input type="text" class="form-control" id="LabelIntervention" ng-model="inter.label">
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="LabelIntervention"
+                                ng-model="inter.label"
+                                ng-model-options="{ updateOn: 'blur' }"
+
+                        >
 
                         <label for="LabelDescription">Description</label>
                         <textarea ng-model="inter.description" class="form-control"
