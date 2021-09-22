@@ -113,6 +113,8 @@ def edit_intervention(intervention):
             if dict_update.get('date_intervention'):
                 dict_update['date_intervention'] = datetime.strptime(dict_update['date_intervention'],
                                                                      '%d/%m/%Y %H:%M:%S')
+            else:
+                dict_update['date_intervention'] = None
             get_intervention.update(dict_update)
             sqlite_manager.session.commit()
             sqlite_manager.session.close()

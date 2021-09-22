@@ -50,6 +50,7 @@ python -m unittest discover
 ```
 flask run
 ```
+la table SqLite est présente dans le repo, pas besoin de la créer.
 
 
 
