@@ -1,4 +1,4 @@
-# TODO: Méthode importé de mes autrs projet qui me permet de transformer un objet SqlAlchemy en dict
+# TODO: Méthode importé de mes autres projet qui me permet de transformer un objet SqlAlchemy en dict
 
 import collections
 import enum
@@ -31,9 +31,9 @@ def todict(obj):
 
 
 # TODO: Création du status coté back
-#   Le status n'est pas présent dans la base de donnée, car impossible pour elle de changer "en temps reel"
+#   Le status n'est pas présent dans la base de données, car impossible pour elle de changer "en temps reel"
 #   Je renvoie donc systematique l'objet avec le status
-#   Il n'est pas calculé coté front, car si une autre application veux requeter sur l'API elle n'aurait pas l'information du status (exemple requete via Postman)
+#   Il n'est pas calculé côté front, car si une autre application veut requeter sur l'API elle n'aurait pas l'information du status (exemple requete via Postman)
 def get_status(intervention: dict) -> dict:
     """
     Definition of the status of the intervention

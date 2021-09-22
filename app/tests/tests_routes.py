@@ -1,16 +1,16 @@
-# TODO: Liste de mes tests présent ici.
-#   Les tests sont assez "basique" car je n'avais pas forcement le temps de faire des tests tres poussé.
-#   les tests présents me permets surtout de voir si mes routes fonctionnent bien dans une utilisation "normale"
+# TODO: Liste de mes tests présents ici.
+#   Les tests sont assez "basique" car je n'avais pas forcément le temps de faire des tests tres poussé.
+#   les tests présents me permettent surtout de voir si mes routes fonctionnent bien dans une utilisation "normale"
 
 """ unit test for app import osmose"""
 import os
 import unittest
-from pathlib import Path
 from datetime import datetime
-from app import app as flask_app
+from pathlib import Path
 
-from app.tools.sqllite_manager import SqliteManager
+from app import app as flask_app
 from app.models.intervention import Intervention
+from app.tools.sqllite_manager import SqliteManager
 
 
 class TestRoutes(unittest.TestCase):
@@ -206,10 +206,14 @@ class TestRoutes(unittest.TestCase):
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
         self.sqllite_manager.session.close()
         response = self.client.delete(
-            f'/interventions/{intervention_object.intervention_id +1}',
+            f'/interventions/{intervention_object.intervention_id + 1}',
         )
 
         self.assertEqual(response.status_code, 404)
 
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').all()
         self.assertEqual(len(intervention_object), 1)
+
+
+if __name__ == '__main__':
+    unittest.main()

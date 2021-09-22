@@ -1,4 +1,4 @@
-# TODO: Je suis partie sur ce genre de model car il n'est pas ammener à évoluer.
+# TODO: Je suis partie sur ce genre de model, car il n'est pas ammené à évoluer.
 #    Sur un projet plus "évoluer", j'aurais créé une table Author séparé.
 
 """Models tables intervention database"""

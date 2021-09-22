@@ -1,5 +1,5 @@
-# TODO: La calss SqliteManager me permet d'initialiser la connection à la DB
-#   Les méthodes clean_table / create_table / delete_table sont surtout là pour les test ou pour la 1er utilisation
+# TODO: La calss SqliteManager me permet d'initialiser la connexion à la DB
+#   Les méthodes clean_table / create_table / delete_table sont surtout là pour les tests ou pour la 1er utilisation
 #   Normalement je fais toutes mes requetes Sql ici, mais vu que l'application est petite, elles sont directement dans les routes
 
 """Manage request SQLAlchemy"""

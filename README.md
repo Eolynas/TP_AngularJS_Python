@@ -32,6 +32,7 @@ Création d'un environnement virtuel (/!\ Attention à la version)
 pip install virtualenv
 virtualenv -p /usr/bin/python3.7 venv
 
+
 source venv/bin/activate
 ```
 
@@ -40,10 +41,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+- Lancement des tests:
+```
+python -m unittest discover
+```
+
 - Lancement du programme:
 ```
 flask run
 ```
+
+
 
 ###Variable d'environnement
 ```
@@ -51,12 +59,12 @@ SECRET_KEY: secret key de votre application flask
 ```
 
 -----------------
-## Futur amélioration
+## Future amélioration
 
 - Ajout / amélioration de test unitaire pour la partie flask (python)
 - Création de test unitaire pour la partie AngularJS
 - Ajout d'une pagination pour le tableau
-- Ajout d'un champs de recherche pour les interventions
+- Ajout d'un champ de recherche pour les interventions
 - Création d'un vrai design
 - Gestion des doublons
 
@@ -64,7 +72,7 @@ SECRET_KEY: secret key de votre application flask
 ## Listes des bugs
 
 - Probleme si la date ne correspond pas au format précis (dd/mm/yyyy hh:mm:ss)
-- Si vous faite une edition d'une intervention et qu'une erreur est survenue, l'edition se fait quand meme coté front
+- Si vous faites une edition d'une intervention et qu'une erreur est survenue, l'edition se fait quand même côté front
 - Il arrive parfois qu'une erreur arrive si vous supprimez trop d'intervention d'un coup (tentative de correction via ?check_same_thread=False' dans le sqllite_manager
 - 
  -----------------

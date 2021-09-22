@@ -1,4 +1,5 @@
 """ this module takes care of the flask routes """
+
 from datetime import datetime
 
 from flask import render_template, jsonify, make_response
@@ -71,7 +72,8 @@ def add_intervention():
         sqlite_manager.session.close()
 
         if new_intervention:
-            new_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=new_intervention).first()
+            new_intervention = sqlite_manager.session.query(Intervention).filter_by(
+                intervention_id=new_intervention).first()
             sqlite_manager.session.close()
 
             # Check status:
@@ -100,7 +102,6 @@ def edit_intervention(intervention):
 
     if get_intervention.first():
 
-        # Check diff
         dict_update = {}
 
         try:
@@ -118,7 +119,8 @@ def edit_intervention(intervention):
 
             message = f"L'intervention à bien été modifié"
             logger.info(message)
-            interventions = get_status(todict(sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention).first()))
+            interventions = get_status(
+                todict(sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention).first()))
             sqlite_manager.session.close()
 
             return make_response(jsonify(interventions), 200)
@@ -132,7 +134,6 @@ def edit_intervention(intervention):
             logger.error(message)
             logger.error(e)
             return make_response(message, 404)
-
 
     message = f"Une erreur est survenue lors de la modification de l'intervention"
     logger.error(message)
@@ -153,7 +154,7 @@ def delete_intervention(intervention):
         sqlite_manager.session.commit()
         sqlite_manager.session.close()
 
-        message = f"L'intervention à bien était supprimé"
+        message = f"L'intervention à bien été supprimé"
         logger.info(message)
         return make_response(message, 204)
 

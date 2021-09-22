@@ -21,10 +21,10 @@ angular.module('ticketApp', [])
             }, function (response) {
                     $scope.message = response.data
                 });
-        // TODO: Request post pour ajouter des intervention
+        // TODO: Request post pour ajouter des interventions
         //  Un petit bug arrive si on ajoute des interventions à la suite
         //  Si on met par exemple une description pour la 1er mais pas dans la 2eme, la description de la 1er se met dans la 2eme
-        //  Surement du faite que je ne "reset" pas comme il faut le ng-model
+        //  Surement à cause du "reset" de ng-model
         $scope.postdata = function (label, description, author, location, date_intervention) {
             var intervention = {
                 label: label,
@@ -45,9 +45,8 @@ angular.module('ticketApp', [])
                 });
         }
 
-        // TODO: Request delete pour supprimer des intervention
-        //  Un petit bug arrive si on supprime trop d'intervention d'un coup
-        //  Visiblement le probleme viens de SqlLite
+        // TODO: Request delete pour supprimer des interventions
+        //  Un petit bug arrive si on supprime trop d'intervention d'un coup (visiblement réglé voir README)
         $scope.deleteIntervention = function (index, intervention_id) {
             var index = index
             $http.delete("/interventions/" + intervention_id)
