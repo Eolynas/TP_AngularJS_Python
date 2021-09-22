@@ -1,0 +1,4 @@
+# TODO Partie non utilisé car le projet reste tres simple. Je l'ai laissé à titre d'exemple
+
+[sqliteserver]
+db_url = path -> db_url for sqlite database
