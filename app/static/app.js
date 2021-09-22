@@ -6,42 +6,56 @@ angular.module('ticketApp', [])
     .controller('myCtrl', ['$scope', '$http', function ($scope, $http) {
         $scope.orderByField = 'date_intervention';
         $scope.reverseSort = false;
+        // TODO: Ajout d'un message d'erreur (message retour de l'API)
+        $scope.message = false;
 
         $scope.list_interventions = []
         $http.get('/interventions')
             .then(function (response) {
                 for (index in response.data) {
-                    intervention = status_intervention(response.data[index])
-                    response.data[index] = intervention
+                    response.data[index] = response.data[index]
                     response.data[index].index = parseInt(index) + 1
                 }
-
                 $scope.list_interventions = response.data
-            });
+                $scope.message = false
+            }, function (response) {
+                    $scope.message = response.data
+                });
+        // TODO: Request post pour ajouter des intervention
+        //  Un petit bug arrive si on ajoute des interventions à la suite
+        //  Si on met par exemple une description pour la 1er mais pas dans la 2eme, la description de la 1er se met dans la 2eme
+        //  Surement du faite que je ne "reset" pas comme il faut le ng-model
         $scope.postdata = function (label, description, author, location, date_intervention) {
             var intervention = {
                 label: label,
                 description: description,
                 author: author,
                 location: location,
+                // TODO: Petite difficulté sur les dates, qui sont sensible à la case
+                //  (notamment à cause de SQLlite qui ne prend pas n'importe qu'elle type de format)
                 date_intervention: date_intervention
             };
             $http.post("/interventions", JSON.stringify(intervention))
                 .then(function (response) {
-                    // $scope.books = response.data;
-                    // new_inter = status_intervention(intervention)
-                    new_inter = status_intervention(response.data)
-                    new_inter.index = $scope.list_interventions.length + 1
-                    $scope.list_interventions.push(new_inter);
+                    response.data.index = $scope.list_interventions.length + 1
+                    $scope.list_interventions.push(response.data);
+                    $scope.message = false
+                }, function (response) {
+                    $scope.message = response.data
                 });
-
         }
 
+        // TODO: Request delete pour supprimer des intervention
+        //  Un petit bug arrive si on supprime trop d'intervention d'un coup
+        //  Visiblement le probleme viens de SqlLite
         $scope.deleteIntervention = function (index, intervention_id) {
             var index = index
             $http.delete("/interventions/" + intervention_id)
                 .then(function (response) {
                     $scope.list_interventions.splice(index, 1);
+                    $scope.message = false
+                }, function (response) {
+                    $scope.message = response.data
                 });
 
         }
@@ -54,9 +68,7 @@ angular.module('ticketApp', [])
                 author: author,
                 location: location,
                 date_intervention: date_intervention
-                // date_intervention: moment(date_intervention).format('DD/MM/YYYY h:mm:ss')
             };
-            var index_intervention = index
             $http.put("/interventions/" + intervention_id, JSON.stringify(intervention))
                 .then(function (response) {
                     if (moment(response.data.date_intervention) < moment()) {
@@ -70,7 +82,11 @@ angular.module('ticketApp', [])
                             intervention.status = 'Brouillon'
                         }
                     }
+                    intervention.index = index +1
                     $scope.list_interventions[index] = intervention
+                    $scope.message = false
+                }, function (response) {
+                    $scope.message = response.data
                 });
         }
     }
@@ -78,25 +94,6 @@ angular.module('ticketApp', [])
     .config(function ($interpolateProvider) {
         $interpolateProvider.startSymbol('[[').endSymbol(']]');
     });
-
-function status_intervention(data) {
-    var status_intervention = 'Validée'
-    for (const [key, value] of Object.entries(data)) {
-        if (value === '' || value == null) {
-            status_intervention = 'Brouillon'
-        }
-        if (key === 'date_intervention') {
-            if (moment(value) < moment()) {
-                status_intervention = 'Terminé'
-            }
-            if (value) {
-                data.date_intervention = moment(value).format('DD/MM/YYYY h:mm:ss')
-            }
-        }
-    }
-    data.status = status_intervention
-    return data
-}
 
 $('#modalFormIntervention').on('shown.bs.modal', function () {
     $('#myInput').trigger('focus')

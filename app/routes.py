@@ -127,6 +127,12 @@ def edit_intervention(intervention):
             message = f"Une erreur est survenue lors de la modification de l'intervention: {e}"
             logger.error(message)
             return make_response(message, 404)
+        except ValueError as e:
+            message = f"Le format de la date n'est pas valide"
+            logger.error(message)
+            logger.error(e)
+            return make_response(message, 404)
+
 
     message = f"Une erreur est survenue lors de la modification de l'intervention"
     logger.error(message)

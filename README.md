@@ -60,7 +60,13 @@ SECRET_KEY: secret key de votre application flask
 - Création d'un vrai design
 - Gestion des doublons
 
+-----------------
+## Listes des bugs
 
+- Probleme si la date ne correspond pas au format précis (dd/mm/yyyy hh:mm:ss)
+- Si vous faite une edition d'une intervention et qu'une erreur est survenue, l'edition se fait quand meme coté front
+- Il arrive parfois qu'une erreur arrive si vous supprimez trop d'intervention d'un coup (tentative de correction via ?check_same_thread=False' dans le sqllite_manager
+- 
  -----------------
 ## Auteur
 Développeur: Eddy Hubert

@@ -35,7 +35,7 @@ class SqliteManager:
         if os.environ.get("ENV") == "test":
             db_url = os.environ.get("URL_DB_TEST")
         else:
-            db_url = f"sqlite:///{os.path.join(Path(__file__).parents[2], 'ticket.db')}"
+            db_url = f"sqlite:///{os.path.join(Path(__file__).parents[2], 'ticket.db?check_same_thread=False')}"
         self.engine = create_engine(db_url)
         self.conn = self.engine.connect()
         self.metadata = MetaData()

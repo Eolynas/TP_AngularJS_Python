@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html>
-{#<html ng-app="interventionApp">#}
 <head>
     <title>TP AngularJS / Python</title>
     <!-- Check version: https://code.angularjs.org/ -->
-    {#    <script src="static/angular.min.js"></script>#}
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -28,6 +26,10 @@
     <h1>Listes des interventions</h1>
 
     <button ng-click="orderByField='firstName'; reverseSort = !reverseSort">Filtrer par date</button>
+
+    <div ng-if="message !== false" class="alert alert-danger" role="alert">
+        [[message]]
+    </div>
     <table class="table" id="tableIntervention">
         <thead>
         <tr>
@@ -61,6 +63,10 @@
         </tbody>
     </table>
     {#  MODAL EDIT INTERVENTION  #}
+    {#
+        TODO: Cette partie pourrait etre amélioré car je genere un modal pour chaque intervention (afin d'avoir les données prérempli
+            mais ca implique que si j'ai 2000 intervention, j'ai également 2000 modal
+    #}
     <div ng-repeat="inter in list_interventions" class="modal" id="[['modal' + inter.intervention_id]]" tabindex="-1"
          role="dialog">
         <div class="modal-dialog" role="document">
@@ -97,6 +103,10 @@
                         <label for="LabelDate">Date de l'intervention</label>
                         <input type="text" ng-model="inter.date_intervention" class="form-control" id="LabelDate"
                                placeholder="exemple: 18/09/2021 12:00:00">
+                        <div class="alert alert-danger" role="alert">
+                            Attention, le formulaire est sensible à la case.
+                            Il faut bien respecter le format (ex: 22/09/2021 11:00:00)
+                        </div>
 
                     </div>
                     <div class="modal-footer">
@@ -145,6 +155,10 @@
                         <label for="AddLabelDate">Date de l'intervention</label>
                         <input type="text" ng-model="date_intervention" class="form-control" id="AddLabelDate"
                                placeholder="exemple: 18/09/2021 12:00:00">
+                        <div class="alert alert-danger" role="alert">
+                            Attention, le formulaire est sensible à la case.
+                            Il faut bien respecter le format (ex: 22/09/2021 11:00:00)
+                        </div>
 
                     </div>
                     <div class="modal-footer">

@@ -45,10 +45,13 @@ def get_status(intervention: dict) -> dict:
             intervention['status'] = "Brouillon"
             break
 
-    if not intervention.get('status'):
-        if intervention['date_intervention'] < datetime.now():
-            intervention['status'] = "Terminée"
-        else:
-            intervention['status'] = "Validée"
+    if intervention.get('date_intervention'):
+        if not intervention.get('status'):
+            if intervention['date_intervention'] < datetime.now():
+                intervention['status'] = "Terminée"
+            else:
+                intervention['status'] = "Validée"
+
+        intervention['date_intervention'] = intervention['date_intervention'].strftime("%m/%d/%Y %H:%M:%S")
 
     return intervention
