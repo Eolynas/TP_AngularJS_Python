@@ -23,13 +23,6 @@ def setup_logging(
             try:
                 config_yaml = yaml.safe_load(f.read())
 
-                if config_yaml["handlers"].get("logstash"):
-                    config_yaml["handlers"]["logstash"]["host"] = config["logstash"][
-                        "host"
-                    ]
-                    config_yaml["handlers"]["logstash"]["port"] = config["logstash"][
-                        "port"
-                    ]
                 logging.config.dictConfig(config_yaml)
                 if bool(os.getenv("NO_LOGGING", False)):
                     logging.disable()

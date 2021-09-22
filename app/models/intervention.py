@@ -1,4 +1,7 @@
-"""Models of the tables Sigmat of the postgres database"""
+# TODO: Je suis partie sur ce genre de model car il n'est pas ammener à évoluer.
+#    Sur un projet plus "évoluer", j'aurais créé une table Author séparé.
+
+"""Models tables intervention database"""
 from sqlalchemy import Column, DateTime, Integer, String, Text
 
 from app.models import Base

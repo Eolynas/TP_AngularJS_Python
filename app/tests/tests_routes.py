@@ -1,5 +1,8 @@
+# TODO: Liste de mes tests présent ici.
+#   Les tests sont assez "basique" car je n'avais pas forcement le temps de faire des tests tres poussé.
+#   les tests présents me permets surtout de voir si mes routes fonctionnent bien dans une utilisation "normale"
+
 """ unit test for app import osmose"""
-import json
 import os
 import unittest
 from pathlib import Path
@@ -58,23 +61,6 @@ class TestRoutes(unittest.TestCase):
         self.sqllite_manager.session.commit()
         response = self.client.get('/interventions')
 
-        result_list = [
-            {
-                'label': 'TEST LABEL',
-                'description': "Description",
-                'author': 'Eddy',
-                'location': 'Le Mans',
-                # 'date_intervention': '22/09/2021',
-            },
-            {
-                'label': 'TEST LABEL 2',
-                'description': "Description",
-                'author': 'Bob',
-                'location': 'Nantes',
-                # 'date_intervention': '22/09/2021',
-            }
-        ]
-
         # Testing status code & interventions informations
         self.assertEqual(response.status_code, 200)
 
@@ -83,6 +69,7 @@ class TestRoutes(unittest.TestCase):
             self.assertIn(intervention['author'], ['Eddy', 'Bob'])
             self.assertIn(intervention['location'], ['Le Mans', 'Nantes'])
             self.assertEqual(intervention['description'], "Description")
+            self.assertIn(intervention['status'], ['Terminée', 'Validée'])
 
     def test_add_intervention(self):
         """
@@ -90,13 +77,13 @@ class TestRoutes(unittest.TestCase):
         """
 
         response = self.client.post(
-            '/intervention/add',
+            '/interventions',
             json={
                 'label': 'TEST LABEL',
                 'description': "Création d'une nouvelle intervention",
                 'author': 'Eddy',
                 'location': 'Le Mans',
-                'date_intervention': '22/09/2021 13:00:00',
+                'date_intervention': '22/09/2025 13:00:00',
             },
 
         )
@@ -104,28 +91,26 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
 
         check_insert = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
+        self.sqllite_manager.session.close()
         self.assertEqual(check_insert.label, 'TEST LABEL')
         self.assertEqual(check_insert.description, "Création d'une nouvelle intervention")
         self.assertEqual(check_insert.author, "Eddy")
         self.assertEqual(check_insert.location, 'Le Mans')
-        self.assertEqual(check_insert.date_intervention, datetime.strptime("22/09/2021 13:00:00", '%d/%m/%Y %H:%M:%S'))
+        self.assertEqual(check_insert.date_intervention, datetime.strptime("22/09/2025 13:00:00", '%d/%m/%Y %H:%M:%S'))
+        self.assertEqual(response.json['status'], "Validée")
 
-    def test_add_intervention_with_error_data_post(self):
-        """
-        Test of the addition of a new intervention with error data post
-        """
-
-        response = self.client.post(
-            '/intervention/add',
+        # Check if status "brouillon"
+        response_2 = self.client.post(
+            '/interventions',
             json={
-                'label': 'TEST LABEL',
-                'author': 'Eddy',
-                'description': "Création d'une nouvelle intervention"
+                'label': 'TEST LABEL BROUILLON',
+                'description': "Création d'une nouvelle intervention",
+                'author': '',
+                'location': '',
+                'date_intervention': '22/09/2025 13:00:00',
             },
-
         )
-
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response_2.json['status'], "Brouillon")
 
     def test_edit_intervention_success(self):
         """
@@ -150,13 +135,13 @@ class TestRoutes(unittest.TestCase):
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
         self.sqllite_manager.session.close()
         response = self.client.put(
-            f'/intervention/{intervention_object.intervention_id}',
+            f'/interventions/{intervention_object.intervention_id}',
             json={
                 'label': 'TEST LABEL',
                 'description': 'Description',
                 'author': 'Eddy',
                 'location': 'Nantes',
-                'date_intervention': '22/09/2021, 13:00:00',
+                'date_intervention': '22/01/2021 13:00:00',
             },
 
         )
@@ -165,6 +150,7 @@ class TestRoutes(unittest.TestCase):
 
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
         self.assertEqual(intervention_object.location, 'Nantes')
+        self.assertEqual(response.json['status'], 'Terminée')
 
     def test_delete_intervention_success(self):
         """
@@ -189,10 +175,10 @@ class TestRoutes(unittest.TestCase):
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
         self.sqllite_manager.session.close()
         response = self.client.delete(
-            f'/intervention/{intervention_object.intervention_id}',
+            f'/interventions/{intervention_object.intervention_id}',
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
 
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').all()
         self.assertEqual(len(intervention_object), 0)
@@ -220,7 +206,7 @@ class TestRoutes(unittest.TestCase):
         intervention_object = self.sqllite_manager.session.query(Intervention).filter_by(label='TEST LABEL').first()
         self.sqllite_manager.session.close()
         response = self.client.delete(
-            f'/intervention/{intervention_object.intervention_id +1}',
+            f'/interventions/{intervention_object.intervention_id +1}',
         )
 
         self.assertEqual(response.status_code, 404)

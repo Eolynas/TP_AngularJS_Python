@@ -1,4 +1,8 @@
-"""Manage request postgresql"""
+# TODO: La calss SqliteManager me permet d'initialiser la connection à la DB
+#   Les méthodes clean_table / create_table / delete_table sont surtout là pour les test ou pour la 1er utilisation
+#   Normalement je fais toutes mes requetes Sql ici, mais vu que l'application est petite, elles sont directement dans les routes
+
+"""Manage request SQLAlchemy"""
 import os
 from pathlib import Path
 
@@ -21,7 +25,7 @@ class Singleton(object):
 
 class SqliteManager:
     """
-    Connection postgreSQL
+    Connection database
     """
 
     def __init__(self):
@@ -38,7 +42,6 @@ class SqliteManager:
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
         self.Base = Base
-        self.create_tables()
 
     def create_tables(self):
         """
@@ -60,31 +63,3 @@ class SqliteManager:
 
         connection = self.engine.connect()
         connection.execute(delete_table_sigmat)
-
-    def add_intervention(self, intervention: dict) -> bool:
-        """
-        method for add one intervention
-        """
-
-        # Check is intervention exist
-        result = self.session.query(Intervention).filter_by(
-            label=intervention['label'],
-            description=intervention['description'],
-            author=intervention['author'],
-            location=intervention['location'],
-            date_intervention=intervention['date_intervention'],
-        ).all()
-
-        if len(result) == 0:
-            add_intervention = Intervention(
-                label=intervention['label'],
-                description=intervention['description'],
-                author=intervention['author'],
-                location=intervention['location'],
-                date_intervention=intervention['date_intervention'],
-            )
-            self.session.add(add_intervention)
-            self.session.commit()
-
-            return True
-        return False

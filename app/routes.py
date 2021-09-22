@@ -8,7 +8,7 @@ from app import app
 from app.models.intervention import Intervention
 from app.tools import logger
 from app.tools.sqllite_manager import SqliteManager
-from app.tools.tools import todict
+from app.tools.tools import todict, get_status
 
 
 @app.route("/", methods=["GET"])
@@ -29,100 +29,128 @@ def list_interventions():
     sqlite_manager = SqliteManager()
     if request.method == 'GET':
         get_interventions = sqlite_manager.session.query(Intervention).all()
-        dict_interventions = todict(get_interventions)
+        sqlite_manager.session.close()
 
-        # Format date
-        # for date in dict_interventions:
-        #     date['date_intervention']= date['date_intervention'].strftime("%d/%m/%Y %H:%M:%S")
+        dict_interventions = todict(get_interventions)
+        list_interventions = []
+        for intervention in dict_interventions:
+            intervention = get_status(intervention)
+            list_interventions.append(intervention)
 
         return make_response(jsonify(dict_interventions), 200)
 
 
-@app.route("/intervention/add", methods=["POST"])
+@app.route("/interventions", methods=["POST"])
 def add_intervention():
     """
-    Load home page
+    route for add intervention
     """
     sqlite_manager = SqliteManager()
-    if request.method == 'POST':
-        result = request.json
-        # Check data resquest post
-        # if 'label' in result and 'description' in result and 'author' in result and 'location' in result and 'date_intervention' in result:
-        if 'label' in result:
-            if result.get('date_intervention'):
-                result['date_intervention'] = datetime.strptime(result['date_intervention'], '%d/%m/%Y %H:%M:%S')
-            intervention = {
-                'label': result.get('label'),
-                'description': result.get('description'),
-                'author': result.get('author'),
-                'location': result.get('location'),
-                'date_intervention': result.get('date_intervention')
-            }
-            res_insert = sqlite_manager.add_intervention(intervention=intervention)
-            message = "L'intervetion à bien été enregistré"
-            return make_response(jsonify(message), 201)
+    result = request.json
+    if 'label' in result:
+        if result.get('date_intervention'):
+            result['date_intervention'] = datetime.strptime(result['date_intervention'], '%d/%m/%Y %H:%M:%S')
+        intervention = {
+            'label': result.get('label'),
+            'description': result.get('description'),
+            'author': result.get('author'),
+            'location': result.get('location'),
+            'date_intervention': result.get('date_intervention')
+        }
 
-        message = "Certaines informations sont manquante"
-        return make_response(jsonify(message), 404)
+        add_intervention = Intervention(
+            label=intervention['label'],
+            description=intervention['description'],
+            author=intervention['author'],
+            location=intervention['location'],
+            date_intervention=intervention['date_intervention'],
+        )
+        sqlite_manager.session.add(add_intervention)
+        sqlite_manager.session.commit()
+        new_intervention = add_intervention.intervention_id
+        sqlite_manager.session.close()
+
+        if new_intervention:
+            new_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=new_intervention).first()
+            sqlite_manager.session.close()
+
+            # Check status:
+            intervention = get_status(todict(new_intervention))
+
+            return make_response(jsonify(intervention), 201)
+
+        # TODO: status code 400 car je suppose que c'est le client qui fait une erreur en envoyant la meme chose
+        message = "L'intervention existe deja"
+        return make_response(jsonify(message), 400)
+
+    message = "Le libellé de l'intervention est manquant"
+    return make_response(jsonify(message), 404)
 
 
-@app.route("/intervention/<int:intervention>", methods=["PUT", "DELETE"])
+@app.route("/interventions/<int:intervention>", methods=["PUT"])
 def edit_intervention(intervention):
     """
     Load home page
     """
     sqlite_manager = SqliteManager()
-    if request.method == 'PUT':
 
-        print(intervention)
-        result = request.json
-        # Check if intervention exist
-        get_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention)
+    result = request.json
+    # Check if intervention exist
+    get_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention)
 
-        if get_intervention.first():
+    if get_intervention.first():
 
-            # Check diff
-            dict_update = {}
+        # Check diff
+        dict_update = {}
 
-            try:
-                for key, value in todict(get_intervention.first()).items():
-                    print(key)
-                    if key != 'intervention_id':
-                        if value != result[key]:
-                            dict_update[key] = result[key]
+        try:
+            for key, value in todict(get_intervention.first()).items():
+                if key != 'intervention_id':
+                    if value != result[key]:
+                        dict_update[key] = result[key]
 
-                if dict_update.get('date_intervention'):
-                    dict_update['date_intervention'] = datetime.strptime(dict_update['date_intervention'],
-                                                                         '%d/%m/%Y %H:%M:%S')
-                get_intervention.update(dict_update)
-                sqlite_manager.session.commit()
-                sqlite_manager.session.close()
-
-                message = f"L'intervention à bien était modifié"
-                logger.info(message)
-                return make_response(message, 200)
-
-            except KeyError as e:
-                message = f"Une erreur est survenue lors de la modification de l'intervention: {e}"
-                logger.error(message)
-                return make_response(message, 404)
-
-        message = f"Une erreur est survenue lors de la modification de l'intervention"
-        logger.error(message)
-        return make_response(message, 404)
-
-    if request.method == 'DELETE':
-        get_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention)
-
-        if get_intervention.first():
-            sqlite_manager.session.delete(get_intervention.first())
+            if dict_update.get('date_intervention'):
+                dict_update['date_intervention'] = datetime.strptime(dict_update['date_intervention'],
+                                                                     '%d/%m/%Y %H:%M:%S')
+            get_intervention.update(dict_update)
             sqlite_manager.session.commit()
             sqlite_manager.session.close()
 
-            message = f"L'intervention à bien était supprimé"
+            message = f"L'intervention à bien été modifié"
             logger.info(message)
-            return make_response(message, 200)
+            interventions = get_status(todict(sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention).first()))
+            sqlite_manager.session.close()
 
-        message = f"Une erreur est survenue lors de la suppression de l'intervention"
-        logger.error(message)
-        return make_response(message, 404)
+            return make_response(jsonify(interventions), 200)
+
+        except KeyError as e:
+            message = f"Une erreur est survenue lors de la modification de l'intervention: {e}"
+            logger.error(message)
+            return make_response(message, 404)
+
+    message = f"Une erreur est survenue lors de la modification de l'intervention"
+    logger.error(message)
+    return make_response(message, 404)
+
+
+@app.route("/interventions/<int:intervention>", methods=["DELETE"])
+def delete_intervention(intervention):
+    """
+    Route for delete intervention
+    """
+
+    sqlite_manager = SqliteManager()
+    get_intervention = sqlite_manager.session.query(Intervention).filter_by(intervention_id=intervention)
+
+    if get_intervention.first():
+        sqlite_manager.session.delete(get_intervention.first())
+        sqlite_manager.session.commit()
+        sqlite_manager.session.close()
+
+        message = f"L'intervention à bien était supprimé"
+        logger.info(message)
+        return make_response(message, 204)
+
+    message = f"Une erreur est survenue lors de la suppression de l'intervention"
+    logger.error(message)
+    return make_response(message, 404)

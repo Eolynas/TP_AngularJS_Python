@@ -2,7 +2,7 @@
 <html>
 {#<html ng-app="interventionApp">#}
 <head>
-    <title>Hello AngularJS</title>
+    <title>TP AngularJS / Python</title>
     <!-- Check version: https://code.angularjs.org/ -->
     {#    <script src="static/angular.min.js"></script>#}
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
@@ -18,17 +18,17 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
-
-
     <script src="static/app.js"></script>
     <script src="static/moment-with-locales.min.js"></script>
+
 </head>
 
 <body ng-app="ticketApp">
 <section ng-controller="myCtrl">
     <h1>Listes des interventions</h1>
 
-    <table class="table">
+    <button ng-click="orderByField='firstName'; reverseSort = !reverseSort">Filtrer par date</button>
+    <table class="table" id="tableIntervention">
         <thead>
         <tr>
             <th scope="col">#</th>
@@ -42,24 +42,27 @@
             <th scope="col">Supprimer</th>
         </tr>
         </thead>
-        <tbody ng-repeat="inter in list_interventions">
-            <th>[[inter.intervention_id]]</th>
-            <th>[[inter.label]]</th>
-            <th>[[inter.description]]</th>
-            <th>[[inter.author]]</th>
-            <th>[[inter.location]]</th>
-            <th>[[inter.date_intervention | date:'yyyy']]</th>
-            <th>[[inter.status]]</th>
-            <th>
+        <tbody ng-repeat="inter in list_interventions | orderBy:orderByField:reverseSort">
+        <tr>
+            <td>[[inter.index]]</td>
+            <td>[[inter.label]]</td>
+            <td>[[inter.description]]</td>
+            <td>[[inter.author]]</td>
+            <td>[[inter.location]]</td>
+            <td>[[inter.date_intervention | date: 'dd-MM-yyyy HH:mm:ss']]</td>
+            <td>[[inter.status]]</td>
+            <td>
                 <button data-toggle="modal" data-target="[['#modal' + inter.intervention_id]]">Modifier</button>
-            </th>
-            <th>
-                <button ng-click="deleteIntervention(inter.intervention_id)">Supprimer [[inter.intervention_id]]</button>
-            </th>
+            </td>
+            <td>
+                <button class="btn btn-danger" ng-click="deleteIntervention($index, inter.intervention_id)">Supprimer</button>
+            </td>
+        </tr>
         </tbody>
     </table>
     {#  MODAL EDIT INTERVENTION  #}
-    <div ng-repeat="inter in list_interventions" class="modal" id="[['modal' + inter.intervention_id]]" tabindex="-1" role="dialog">
+    <div ng-repeat="inter in list_interventions" class="modal" id="[['modal' + inter.intervention_id]]" tabindex="-1"
+         role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -126,28 +129,28 @@
                 <form id="addIntervention" method="post">
                     <div class="modal-body">
 
-                        <label for="LabelIntervention">Libellé</label>
-                        <input type="text" class="form-control" id="LabelIntervention" ng-model="label">
+                        <label for="AddLabelIntervention">Libellé</label>
+                        <input type="text" class="form-control" id="AddLabelIntervention" ng-model="label">
 
-                        <label for="LabelDescription">Description</label>
+                        <label for="AddLabelDescription">Description</label>
                         <textarea ng-model="description" class="form-control"
-                                  id="LabelDescription"></textarea>
+                                  id="AddLabelDescription"></textarea>
 
-                        <label for="LabelAuthor">Votre nom</label>
-                        <input type="text" ng-model="author" class="form-control" id="LabelAuthor">
+                        <label for="AddLabelAuthor">Votre nom</label>
+                        <input type="text" ng-model="author" class="form-control" id="AddLabelAuthor">
                         {##}
-                        <label for="LabelLocation">Lieux de l'intervention</label>
-                        <input type="text" ng-model="location" class="form-control" id="LabelLocation">
+                        <label for="AddLabelLocation">Lieux de l'intervention</label>
+                        <input type="text" ng-model="location" class="form-control" id="AddLabelLocation">
                         {##}
-                        <label for="LabelDate">Date de l'intervention</label>
-                        <input type="text" ng-model="date_intervention" class="form-control" id="LabelDate"
+                        <label for="AddLabelDate">Date de l'intervention</label>
+                        <input type="text" ng-model="date_intervention" class="form-control" id="AddLabelDate"
                                placeholder="exemple: 18/09/2021 12:00:00">
 
                     </div>
                     <div class="modal-footer">
                         <button type="submit"
                                 ng-click="postdata(label, description, author, location, date_intervention)"
-                                class="btn btn-primary" data-dismiss="modal">Valider ma demande
+                                class="btn btn-primary" id="buttonModal" data-dismiss="modal">Valider ma demande
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulé</button>
                     </div>
